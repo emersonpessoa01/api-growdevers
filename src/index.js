@@ -1,6 +1,8 @@
 import express from "express";
 import * as dotenv from "dotenv";
 import { growdevers } from "./dados.js";
+import { randomUUID } from "crypto";
+
 
 dotenv.config();
 
@@ -17,7 +19,24 @@ app.get("/growdevers", (req, res) => {
   });
 });
 
+/* POST  /growdevers - Criar lista de growdevers */
+app.post("/growdevers", (req, res) => {
+  const { nome, email, idade } = req.body;
+  const novoGrowdever = {
+    id: randomUUID(),
+    nome,
+    email,
+    idade,
+    matricula:true,
+  };
 
+  growdevers.push(novoGrowdever);
+  res.status(201).json({
+    ok: true,
+    mensagem: "Growdever criado com sucesso!",
+    growdever: novoGrowdever,
+  });
+});
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
