@@ -11,7 +11,7 @@ app.use(express.json());
 /* Criar nossas rotas */
 /* GET /growdevers - listar growdevers */
 app.get("/growdevers", (req, res) => {
-  res.status(200).json({
+  res.status(200).send({
     ok: true,
     mensagem: "Lista de growdevers",
     growdevers,
@@ -61,7 +61,7 @@ app.delete("/growdevers/:id", (req, res) => {
   const { id } = req.params;
   const index = growdevers.findIndex((growdever) => growdever.id === id);
   if (index === -1) {
-    return res.status(404).json({
+    return res.status(404).send({
       ok: false,
       mensagem: "Growdever não encontrado",
     });
