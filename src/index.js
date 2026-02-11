@@ -18,6 +18,23 @@ app.get("/growdevers", (req, res) => {
   });
 });
 
+/* GET /growdevers/:id - Listar growdevers pelo ID */
+app.get("/growdevers/:id", (req, res) => {
+  const { id } = req.params;
+  const growdever = growdevers.find((growdever) => growdever.id === id);
+  if (!growdever) {
+    return res.status(404).send({
+      ok: false,
+      mensagem: "Growdever não encontrado",
+    });
+  }
+  res.status(200).send({
+    ok: true,
+    mensagem:"Growdever encontrado com sucesso!",
+    dados: growdever
+  });
+});
+
 /* POST  /growdevers - Criar lista de growdevers */
 app.post("/growdevers", (req, res) => {
   const { nome, email, idade } = req.body;
@@ -30,7 +47,7 @@ app.post("/growdevers", (req, res) => {
   };
 
   growdevers.push(novoGrowdever);
-  res.status(201).json({
+  res.status(201).send({
     ok: true,
     mensagem: "Growdever criado com sucesso!",
     growdever: novoGrowdever,
