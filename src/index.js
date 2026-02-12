@@ -23,19 +23,17 @@ app.use(express.json());
 app.get("/growdevers", (req, res) => {
   const { idade, nome } = req.query;
 
-  let dados = growdevers;
-  if (idade) {
-    dados = dados.filter((dado) => dado.idade === Number(idade));
-  }
-
-  if (nome) {
-    dados = dados.filter(( dado ) => dado.nome.includes(nome));
-  }
+  // Filtramos em umaúnica passada para ganhar performance
+  const dadosFiltrados = growdevers.filter((dado) => {
+    const filtroIdade = idade ? dado.idade === Number(idade) : true;
+    const filtroNome = nome ? dado.nome.toLowerCase().includes(nome.toLocaleLowerCase()) : true;
+    return filtroIdade && filtroNome;
+  });
 
   res.status(200).send({
     ok: true,
-    mensagem: "Growdever listado com sucesso",
-    dados,
+    mensagem: "Growdever encontrados",
+    dados: dadosFiltrados,
   });
 });
 
