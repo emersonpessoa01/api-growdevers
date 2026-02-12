@@ -1,0 +1,11 @@
+{
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": false,
+  "printWidth": 60,
+  "plugins": ["prettier-plugin-jsdoc"],
+  "jsdocCommentLineStrategy": "multiline",
+  "jsdocPrintWidth": 60,
+  "jsdocSeparateReturnsFromDescription": true
+}
