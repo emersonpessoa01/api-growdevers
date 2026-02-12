@@ -21,13 +21,15 @@ app.use(express.json());
 /* Filtros comQuery Params */
 /* GET growdever?params="value" */
 app.get("/growdevers", (req, res) => {
-  const { idade, nome } = req.query;
+  const { idade, nome, email, email_includes } = req.query;
 
   // Filtramos em umaúnica passada para ganhar performance
   const dadosFiltrados = growdevers.filter((dado) => {
-    const filtroIdade = idade ? dado.idade === Number(idade) : true;
-    const filtroNome = nome ? dado.nome.toLowerCase().includes(nome.toLocaleLowerCase()) : true;
-    return filtroIdade && filtroNome;
+    const filtroIdade = idade ? dado.idade >= Number(idade) : true;
+    const filtroNome = nome ? dado.nome.toLowerCase().includes(nome.toLowerCase()) : true;
+    const filtroEmail = email ? dado.email.toLowerCase() === email.toLowerCase() : true;
+    const filtroEmailIncludes = email_includes ? dado.email.toLowerCase().includes(email_includes.toLowerCase()) : true;
+    return filtroIdade && filtroNome && filtroEmail && filtroEmailIncludes;
   });
 
   res.status(200).send({
