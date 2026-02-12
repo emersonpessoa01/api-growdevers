@@ -10,11 +10,32 @@ app.use(express.json());
 
 /* Criar nossas rotas */
 /* GET /growdevers - listar growdevers */
+// app.get("/growdevers", (req, res) => {
+//   res.status(200).send({
+//     ok: true,
+//     mensagem: "Lista de growdevers",
+//     growdevers,
+//   });
+// });
+
+/* Filtros comQuery Params */
+/* GET growdever?params="value" */
 app.get("/growdevers", (req, res) => {
+  const { idade, nome } = req.query;
+
+  let dados = growdevers;
+  if (idade) {
+    dados = dados.filter((dado) => dado.idade === Number(idade));
+  }
+
+  if (nome) {
+    dados = dados.filter(( dado ) => dado.nome.includes(nome));
+  }
+
   res.status(200).send({
     ok: true,
-    mensagem: "Lista de growdevers",
-    growdevers,
+    mensagem: "Growdever listado com sucesso",
+    dados,
   });
 });
 
@@ -30,8 +51,8 @@ app.get("/growdevers/:id", (req, res) => {
   }
   res.status(200).send({
     ok: true,
-    mensagem:"Growdever encontrado com sucesso!",
-    dados: growdever
+    mensagem: "Growdever encontrado com sucesso!",
+    dados: growdever,
   });
 });
 
