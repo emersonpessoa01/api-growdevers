@@ -104,6 +104,7 @@ app.put("/growdevers/:id", (req, res) => {
 /* PATCH /growdever/:id - Toggle do campo matriculado */
 app.patch("/growdevers/:id", (req, res) => {
   const { id } = req.params;
+  const { nome, email, idade, matriculado } = req.body;
   const growdever = growdevers.find(
     (growdever) => growdever.id === id,
   );
@@ -113,7 +114,17 @@ app.patch("/growdevers/:id", (req, res) => {
       mensagem: "Growdever não encontrado",
     });
   }
-  growdever.matriculado = !growdever.matriculado;
+
+  // Lógica de alteraçã:sómuaseo valorfor enviado no body
+  if (nome) growdever.nome = nome;
+  if (email) growdever.email = email;
+  if (idade) growdever.idade = idade;
+
+  // Para booleanos, checa se não é undefined (pois false é um valor válido)
+
+  if (matriculado !== undefined) {
+    growdever.matriculado = matriculado;
+  }
 
   res.status(200).send({
     ok: true,
@@ -130,7 +141,7 @@ app.post("/growdevers", (req, res) => {
     nome,
     email,
     idade,
-    matriculado: true
+    matriculado: true,
   };
 
   growdevers.push(novoGrowdever);
@@ -140,7 +151,6 @@ app.post("/growdevers", (req, res) => {
     growdever: novoGrowdever,
   });
 });
-
 
 /* DELETE /growdevers/:id - Deletar um growdever */
 app.delete("/growdevers/:id", (req, res) => {
