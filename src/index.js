@@ -91,7 +91,7 @@ app.put("/growdevers/:id", (req, res) => {
 
   growdever.nome = nome;
   growdever.email = email;
-  growdever.idade = idade;
+  growdever.idade = Number(idade);
   growdever.matriculado = matriculado;
 
   res.status(200).send({
@@ -115,10 +115,10 @@ app.patch("/growdevers/:id", (req, res) => {
     });
   }
 
-  // Lógica de alteraçã:sómuaseo valorfor enviado no body
+  // Lógica de alteração: só muda se o valor for enviado no body
   if (nome) growdever.nome = nome;
   if (email) growdever.email = email;
-  if (idade) growdever.idade = idade;
+  if (idade) growdever.idade = Number(idade);
 
   // Para booleanos, checa se não é undefined (pois false é um valor válido)
 
