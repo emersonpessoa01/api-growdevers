@@ -25,11 +25,26 @@ app.get("/growdevers", (req, res) => {
 
   // Filtramos em umaúnica passada para ganhar performance
   const dadosFiltrados = growdevers.filter((dado) => {
-    const filtroIdade = idade ? dado.idade >= Number(idade) : true;
-    const filtroNome = nome ? dado.nome.toLowerCase().includes(nome.toLowerCase()) : true;
-    const filtroEmail = email ? dado.email.toLowerCase() === email.toLowerCase() : true;
-    const filtroEmailIncludes = email_includes ? dado.email.toLowerCase().includes(email_includes.toLowerCase()) : true;
-    return filtroIdade && filtroNome && filtroEmail && filtroEmailIncludes;
+    const filtroIdade = idade
+      ? dado.idade >= Number(idade)
+      : true;
+    const filtroNome = nome
+      ? dado.nome.toLowerCase().includes(nome.toLowerCase())
+      : true;
+    const filtroEmail = email
+      ? dado.email.toLowerCase() === email.toLowerCase()
+      : true;
+    const filtroEmailIncludes = email_includes
+      ? dado.email
+          .toLowerCase()
+          .includes(email_includes.toLowerCase())
+      : true;
+    return (
+      filtroIdade &&
+      filtroNome &&
+      filtroEmail &&
+      filtroEmailIncludes
+    );
   });
 
   res.status(200).send({
@@ -42,7 +57,9 @@ app.get("/growdevers", (req, res) => {
 /* GET /growdevers/:id - Listar growdevers pelo ID */
 app.get("/growdevers/:id", (req, res) => {
   const { id } = req.params;
-  const growdever = growdevers.find((growdever) => growdever.id === id);
+  const growdever = growdevers.find(
+    (growdever) => growdever.id === id,
+  );
   if (!growdever) {
     return res.status(404).send({
       ok: false,
@@ -56,15 +73,64 @@ app.get("/growdevers/:id", (req, res) => {
   });
 });
 
+/* PUT /growdever/:id - Atualizar growdever específico */
+app.put("/growdever/:id", (req, res) => {
+  const { id } = req.params;
+  const { nome, email, idade, matriculado } = req.body;
+
+  const growdever = growdevers.find(
+    (growdever) => growdever.id === id,
+  );
+
+  if (!growdever) {
+    return res.status(404).send({
+      ok: false,
+      mensagem: "Growdever não encontrado",
+    });
+  }
+
+  growdever.nome = nome;
+  growdever.email = email;
+  growdever.idade = idade;
+  growdever.matriculado = matriculado;
+
+  res.status(200).send({
+    ok: true,
+    mensagem: "Growdever atualizado com sucesso!",
+    dados: growdevers,
+  });
+});
+
+/* PATCH /growdever/:id - Toggle do campo matriculado */
+app.patch("/growdevers/:id", (req, res) => {
+  const { id } = req.params;
+  const growdever = growdevers.find(
+    (growdever) => growdever.id === id,
+  );
+  if (!growdever) {
+    return res.status(404).send({
+      ok: false,
+      mensagem: "Growdever não encontrado",
+    });
+  }
+  growdever.matriculado = !growdever.matriculado;
+
+  res.status(200).send({
+    ok: true,
+    mensagem: "Growdever encontrado com sucesso",
+    dados: growdever,
+  });
+});
+
 /* POST  /growdevers - Criar lista de growdevers */
 app.post("/growdevers", (req, res) => {
-  const { nome, email, idade } = req.body;
+  const { nome, email, idade, matriculado } = req.body;
   const novoGrowdever = {
     id: randomUUID(),
     nome,
     email,
     idade,
-    matricula: true,
+    matriculado: true
   };
 
   growdevers.push(novoGrowdever);
@@ -75,12 +141,13 @@ app.post("/growdevers", (req, res) => {
   });
 });
 
-/* PUT /growdevers/:id - Atualizar um growdever */
 
 /* DELETE /growdevers/:id - Deletar um growdever */
 app.delete("/growdevers/:id", (req, res) => {
   const { id } = req.params;
-  const index = growdevers.findIndex((growdever) => growdever.id === id);
+  const index = growdevers.findIndex(
+    (growdever) => growdever.id === id,
+  );
   if (index === -1) {
     return res.status(404).send({
       ok: false,
@@ -96,5 +163,7 @@ app.delete("/growdevers/:id", (req, res) => {
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT} e http://localhost:${PORT}`);
+  console.log(
+    `Servidor rodando na porta ${PORT} e http://localhost:${PORT}`,
+  );
 });
