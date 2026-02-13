@@ -74,7 +74,7 @@ app.get("/growdevers/:id", (req, res) => {
 });
 
 /* PUT /growdever/:id - Atualizar growdever específico */
-app.put("/growdever/:id", (req, res) => {
+app.put("/growdevers/:id", (req, res) => {
   const { id } = req.params;
   const { nome, email, idade, matriculado } = req.body;
 
