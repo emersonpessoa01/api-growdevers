@@ -23,7 +23,7 @@ app.use(express.json());
 app.get("/growdevers", (req, res) => {
   const { idade, nome, email, email_includes } = req.query;
 
-  // Filtramos em umaúnica passada para ganhar performance
+  // Filtramos em uma única passada para ganhar performance
   const dadosFiltrados = growdevers.filter((dado) => {
     const filtroIdade = idade
       ? dado.idade >= Number(idade)
@@ -101,10 +101,9 @@ app.put("/growdevers/:id", (req, res) => {
   });
 });
 
-/* PATCH /growdever/:id - Toggle do campo matriculado */
+/* PATCH /growdever/:id - */
 app.patch("/growdevers/:id", (req, res) => {
   const { id } = req.params;
-  const { nome, email, idade, matriculado } = req.body;
   const growdever = growdevers.find(
     (growdever) => growdever.id === id,
   );
