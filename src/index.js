@@ -115,16 +115,11 @@ app.patch("/growdevers/:id", (req, res) => {
     });
   }
 
-  // Lógica de alteração: só muda se o valor for enviado no body
-  if (nome) growdever.nome = nome;
-  if (email) growdever.email = email;
-  if (idade) growdever.idade = Number(idade);
+  // A MÁGICA para trocar os if´s: Mesclar o quem no body diretamenteno objeto encontrado
+  if(req.body.idade) req.body.idade = Number(req.body.idade)
+  Object.assign(growdever,req.body);
 
-  // Para booleanos, checa se não é undefined (pois false é um valor válido)
-
-  if (matriculado !== undefined) {
-    growdever.matriculado = matriculado;
-  }
+ 
 
   res.status(200).send({
     ok: true,
