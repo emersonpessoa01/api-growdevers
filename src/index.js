@@ -21,41 +21,60 @@ app.use(express.json());
 /* Filtros comQuery Params */
 /* GET growdever?params="value" */
 app.get("/growdevers", (req, res) => {
-  const { idade, nome, email, email_includes } = req.query;
+  try {
+    const { idade, nome, email, email_includes } =
+      req.query;
 
-  // Filtramos em uma única passada para ganhar performance
-  const dadosFiltrados = growdevers.filter((dado) => {
-    const filtroIdade = idade
-      ? dado.idade >= Number(idade)
-      : true;
-    const filtroNome = nome
-      ? dado.nome.toLowerCase().includes(nome.toLowerCase())
-      : true;
-    const filtroEmail = email
-      ? dado.email.toLowerCase() === email.toLowerCase()
-      : true;
-    const filtroEmailIncludes = email_includes
-      ? dado.email
-          .toLowerCase()
-          .includes(email_includes.toLowerCase())
-      : true;
-    return (
-      filtroIdade &&
-      filtroNome &&
-      filtroEmail &&
-      filtroEmailIncludes
-    );
-  });
+    // Filtramos em uma única passada para ganhar performance
+    const dadosFiltrados = growdevers.filter((dado) => {
+      const filtroIdade = idade
+        ? dado.idade >= Number(idade)
+        : true;
+      const filtroNome = nome
+        ? dado.nome
+            .toLowerCase()
+            .includes(nome.toLowerCase())
+        : true;
+      const filtroEmail = email
+        ? dado.email.toLowerCase() === email.toLowerCase()
+        : true;
+      const filtroEmailIncludes = email_includes
+        ? dado.email
+            .toLowerCase()
+            .includes(email_includes.toLowerCase())
+        : true;
+      return (
+        filtroIdade &&
+        filtroNome &&
+        filtroEmail &&
+        filtroEmailIncludes
+      );
+    });
 
-  res.status(200).send({
-    ok: true,
-    mensagem: "Growdever encontrados",
-    dados: dadosFiltrados,
-  });
+    res.status(200).send({
+      ok: true,
+      mensagem: "Growdever encontrados",
+      dados: dadosFiltrados,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      mensgem: error.toString(),
+    });
+  }
 });
 
 /* GET /growdevers/:id - Listar growdevers pelo ID */
 app.get("/growdevers/:id", (req, res) => {
+  try {
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      mensgem: error.toString(),
+    });
+  }
   const { id } = req.params;
   const growdever = growdevers.find(
     (growdever) => growdever.id === id,
@@ -75,75 +94,97 @@ app.get("/growdevers/:id", (req, res) => {
 
 /* PUT /growdever/:id - Atualizar growdever específico */
 app.put("/growdevers/:id", (req, res) => {
-  const { id } = req.params;
-  const { nome, email, idade, matriculado } = req.body;
+  try {
+    const { id } = req.params;
+    const { nome, email, idade, matriculado } = req.body;
 
-  const growdever = growdevers.find(
-    (growdever) => growdever.id === id,
-  );
+    const growdever = growdevers.find(
+      (growdever) => growdever.id === id,
+    );
 
-  if (!growdever) {
-    return res.status(404).send({
+    if (!growdever) {
+      return res.status(404).send({
+        ok: false,
+        mensagem: "Growdever não encontrado",
+      });
+    }
+
+    growdever.nome = nome;
+    growdever.email = email;
+    growdever.idade = Number(idade);
+    growdever.matriculado = matriculado;
+
+    res.status(200).send({
+      ok: true,
+      mensagem: "Growdever atualizado com sucesso!",
+      dados: growdevers,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
       ok: false,
-      mensagem: "Growdever não encontrado",
+      mensagem: error.toString(),
     });
   }
-
-  growdever.nome = nome;
-  growdever.email = email;
-  growdever.idade = Number(idade);
-  growdever.matriculado = matriculado;
-
-  res.status(200).send({
-    ok: true,
-    mensagem: "Growdever atualizado com sucesso!",
-    dados: growdevers,
-  });
 });
 
 /* PATCH /growdever/:id - */
 app.patch("/growdevers/:id", (req, res) => {
-  const { id } = req.params;
-  const growdever = growdevers.find(
-    (growdever) => growdever.id === id,
-  );
-  if (!growdever) {
-    return res.status(404).send({
+  try {
+    const { id } = req.params;
+    const growdever = growdevers.find(
+      (growdever) => growdever.id === id,
+    );
+    if (!growdever) {
+      return res.status(404).send({
+        ok: false,
+        mensagem: "Growdever não encontrado",
+      });
+    }
+
+    // A MÁGICA para trocar os if´s: Mesclar o quem no body diretamenteno objeto encontrado
+    if (req.body.idade)
+      req.body.idade = Number(req.body.idade);
+    Object.assign(growdever, req.body);
+
+    res.status(200).send({
+      ok: true,
+      mensagem: "Growdever encontrado com sucesso",
+      dados: growdever,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
       ok: false,
-      mensagem: "Growdever não encontrado",
+      mensagem: error.toString(),
     });
   }
-
-  // A MÁGICA para trocar os if´s: Mesclar o quem no body diretamenteno objeto encontrado
-  if(req.body.idade) req.body.idade = Number(req.body.idade)
-  Object.assign(growdever,req.body);
-
- 
-
-  res.status(200).send({
-    ok: true,
-    mensagem: "Growdever encontrado com sucesso",
-    dados: growdever,
-  });
 });
 
 /* POST  /growdevers - Criar lista de growdevers */
 app.post("/growdevers", (req, res) => {
-  const { nome, email, idade, matriculado } = req.body;
-  const novoGrowdever = {
-    id: randomUUID(),
-    nome,
-    email,
-    idade,
-    matriculado: true,
-  };
+  try {
+    const { nome, email, idade, matriculado } = req.body;
+    const novoGrowdever = {
+      id: randomUUID(),
+      nome,
+      email,
+      idade,
+      matriculado: true,
+    };
 
-  growdevers.push(novoGrowdever);
-  res.status(201).send({
-    ok: true,
-    mensagem: "Growdever criado com sucesso!",
-    growdever: novoGrowdever,
-  });
+    growdevers.push(novoGrowdever);
+    res.status(201).send({
+      ok: true,
+      mensagem: "Growdever criado com sucesso!",
+      growdever: novoGrowdever,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      mensagem: error.toString(),
+    });
+  }
 });
 
 /* DELETE /growdevers/:id - Deletar um growdever */
