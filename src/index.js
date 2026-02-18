@@ -172,6 +172,30 @@ app.post("/growdevers", (req, res) => {
       idade,
       matriculado: true,
     };
+    if(!nome){
+      return res.status(400).json({
+        ok:false,
+        mensagem:"O campo nome não foi informado"
+      })
+    }
+    if(!email){
+      return res.status(400).json({
+        ok:false,
+        mensagem:"O campo email não foi informado"
+      })
+    }
+    if(!idade){
+      return res.status(400).json({
+        ok:false,
+        mensagem:"O campo idade não foi informado"
+      })
+    }
+    if(!matriculado){
+      return res.status(400).json({
+        ok:false,
+        mensagem:"O campo matriculado não foi informado"
+      })
+    }
 
     growdevers.push(novoGrowdever);
     res.status(201).send({
