@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 import {
   logMiddleware,
   logRequestMiddleware,
+  validateGrowdeverMiddleware,
 } from "./middlewares.js";
 
 dotenv.config();
@@ -26,48 +27,25 @@ app.use(express.json());
 /* GET growdever?params="value" */
 app.get(
   "/growdevers",
-  [logMiddleware, logRequestMiddleware],
+  [
+    logMiddleware,
+    logRequestMiddleware,
+    validateGrowdeverMiddleware,
+  ],
   (req, res) => {
     try {
-      const { idade, nome, email, email_includes } =
-        req.query;
-
-      // Filtramos em uma única passada para ganhar performance
-      const dadosFiltrados = growdevers.filter((dado) => {
-        const filtroIdade = idade
-          ? dado.idade >= Number(idade)
-          : true;
-        const filtroNome = nome
-          ? dado.nome
-              .toLowerCase()
-              .includes(nome.toLowerCase())
-          : true;
-        const filtroEmail = email
-          ? dado.email.toLowerCase() === email.toLowerCase()
-          : true;
-        const filtroEmailIncludes = email_includes
-          ? dado.email
-              .toLowerCase()
-              .includes(email_includes.toLowerCase())
-          : true;
-        return (
-          filtroIdade &&
-          filtroNome &&
-          filtroEmail &&
-          filtroEmailIncludes
-        );
-      });
-
+      // recupera o que middleware guardou
+      const dados = req.growdeversFiltrados;
       res.status(200).send({
         ok: true,
         mensagem: "Growdever encontrados",
-        dados: dadosFiltrados,
+        dados: dados,
       });
     } catch (error) {
       console.log(error);
       res.status(500).json({
         ok: false,
-        mensgem: error.toString(),
+        mensagem: error.toString(),
       });
     }
   },
