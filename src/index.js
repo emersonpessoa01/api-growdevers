@@ -174,12 +174,23 @@ app.post("/growdevers", (req, res) => {
     ];
     // Procura se algum campo está faltando ou vazio
     for (const campo of camposObrigatorios) {
-      if (req.body[campo] === undefined || req.body[campo] === "") {
+      if (
+        req.body[campo] === undefined ||
+        req.body[campo] === ""
+      ) {
         return res.status(400).json({
           ok: false,
           mensagem: `O campo ${campo} não foi informado`,
         });
       }
+    }
+    // Verificação de idade mínima
+    if (Number(idade) < 18) {
+      return res.status(400).json({
+        ok: false,
+        mensagem:
+          "O growdever dever ter no mínimo 18 anos de idade",
+      });
     }
     const novoGrowdever = {
       id: randomUUID(),
