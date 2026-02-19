@@ -2,6 +2,10 @@ import express from "express";
 import * as dotenv from "dotenv";
 import { growdevers } from "./dados.js";
 import { randomUUID } from "crypto";
+import {
+  logMiddleware,
+  logRequestMiddleware,
+} from "./middlewares.js";
 
 dotenv.config();
 
@@ -20,50 +24,54 @@ app.use(express.json());
 
 /* Filtros comQuery Params */
 /* GET growdever?params="value" */
-app.get("/growdevers", (req, res) => {
-  try {
-    const { idade, nome, email, email_includes } =
-      req.query;
+app.get(
+  "/growdevers",
+  [logMiddleware, logRequestMiddleware],
+  (req, res) => {
+    try {
+      const { idade, nome, email, email_includes } =
+        req.query;
 
-    // Filtramos em uma única passada para ganhar performance
-    const dadosFiltrados = growdevers.filter((dado) => {
-      const filtroIdade = idade
-        ? dado.idade >= Number(idade)
-        : true;
-      const filtroNome = nome
-        ? dado.nome
-            .toLowerCase()
-            .includes(nome.toLowerCase())
-        : true;
-      const filtroEmail = email
-        ? dado.email.toLowerCase() === email.toLowerCase()
-        : true;
-      const filtroEmailIncludes = email_includes
-        ? dado.email
-            .toLowerCase()
-            .includes(email_includes.toLowerCase())
-        : true;
-      return (
-        filtroIdade &&
-        filtroNome &&
-        filtroEmail &&
-        filtroEmailIncludes
-      );
-    });
+      // Filtramos em uma única passada para ganhar performance
+      const dadosFiltrados = growdevers.filter((dado) => {
+        const filtroIdade = idade
+          ? dado.idade >= Number(idade)
+          : true;
+        const filtroNome = nome
+          ? dado.nome
+              .toLowerCase()
+              .includes(nome.toLowerCase())
+          : true;
+        const filtroEmail = email
+          ? dado.email.toLowerCase() === email.toLowerCase()
+          : true;
+        const filtroEmailIncludes = email_includes
+          ? dado.email
+              .toLowerCase()
+              .includes(email_includes.toLowerCase())
+          : true;
+        return (
+          filtroIdade &&
+          filtroNome &&
+          filtroEmail &&
+          filtroEmailIncludes
+        );
+      });
 
-    res.status(200).send({
-      ok: true,
-      mensagem: "Growdever encontrados",
-      dados: dadosFiltrados,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      ok: false,
-      mensgem: error.toString(),
-    });
-  }
-});
+      res.status(200).send({
+        ok: true,
+        mensagem: "Growdever encontrados",
+        dados: dadosFiltrados,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        ok: false,
+        mensgem: error.toString(),
+      });
+    }
+  },
+);
 
 /* GET /growdevers/:id - Listar growdevers pelo ID */
 app.get("/growdevers/:id", (req, res) => {
@@ -162,7 +170,7 @@ app.patch("/growdevers/:id", (req, res) => {
 });
 
 /* POST  /growdevers - Criar lista de growdevers */
-app.post("/growdevers", (req, res) => {
+app.post("/growdevers", [logMiddleware], (req, res) => {
   try {
     const { nome, email, idade, matriculado } = req.body;
     // Lista de campos obrigatórios
