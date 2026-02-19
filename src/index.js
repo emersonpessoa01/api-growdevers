@@ -165,6 +165,22 @@ app.patch("/growdevers/:id", (req, res) => {
 app.post("/growdevers", (req, res) => {
   try {
     const { nome, email, idade, matriculado } = req.body;
+    // Lista de campos obrigatórios
+    const camposObrigatorios = [
+      "nome",
+      "email",
+      "idade",
+      "matriculado",
+    ];
+    // Procura se algum campo está faltando ou vazio
+    for (const campo of camposObrigatorios) {
+      if (req.body[campo] === undefined || req.body[campo] === "") {
+        return res.status(400).json({
+          ok: false,
+          mensagem: `O campo ${campo} não foi informado`,
+        });
+      }
+    }
     const novoGrowdever = {
       id: randomUUID(),
       nome,
@@ -172,30 +188,6 @@ app.post("/growdevers", (req, res) => {
       idade,
       matriculado: true,
     };
-    if(!nome){
-      return res.status(400).json({
-        ok:false,
-        mensagem:"O campo nome não foi informado"
-      })
-    }
-    if(!email){
-      return res.status(400).json({
-        ok:false,
-        mensagem:"O campo email não foi informado"
-      })
-    }
-    if(!idade){
-      return res.status(400).json({
-        ok:false,
-        mensagem:"O campo idade não foi informado"
-      })
-    }
-    if(!matriculado){
-      return res.status(400).json({
-        ok:false,
-        mensagem:"O campo matriculado não foi informado"
-      })
-    }
 
     growdevers.push(novoGrowdever);
     res.status(201).send({
