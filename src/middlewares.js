@@ -69,29 +69,31 @@ export const verificarCamposObrigatoriosMiddleware = (
 ) => {
   try {
     const { nome, email, idade, matriculado } = req.body;
-    const campos = [
+    // Lista de campos obrigatórios
+    const camposObrigatorios = [
       "nome",
       "email",
       "idade",
       "matriculado",
     ];
-
-    for (const campo of campos) {
+    // Procura se algum campo está faltando ou vazio
+    for (const campo of camposObrigatorios) {
       if (
         req.body[campo] === undefined ||
         req.body[campo] === ""
       ) {
         return res.status(400).json({
           ok: false,
-          mensagem: `O campo ${campo} é obrigatório.`,
+          mensagem: `O campo ${campo} não foi informado`,
         });
       }
     }
-
+    // Verificação de idade mínima
     if (Number(idade) < 18) {
       return res.status(400).json({
         ok: false,
-        mensagem: "O growdever deve ter no mínimo 18 anos.",
+        mensagem:
+          "O growdever dever ter no mínimo 18 anos de idade",
       });
     }
 

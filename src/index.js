@@ -86,7 +86,7 @@ app.put(
   [
     validateGrowdeverMiddleware,
     verificarCamposObrigatoriosMiddleware,
-    verificarExistenciaGrowdeverMiddleware
+    verificarExistenciaGrowdeverMiddleware,
   ],
   (req, res) => {
     try {
@@ -114,90 +114,62 @@ app.put(
 );
 
 /* PATCH /growdever/:id - */
-app.patch("/growdevers/:id", (req, res) => {
-  try {
-    const { id } = req.params;
-    const growdever = growdevers.find(
-      (growdever) => growdever.id === id,
-    );
-    if (!growdever) {
-      return res.status(404).send({
+app.patch(
+  "/growdevers/:id",
+  [verificarExistenciaGrowdeverMiddleware],
+  (req, res) => {
+    try {
+      const growdever = req.growdeverEncontrado;
+
+      // A MÁGICA para trocar os if´s: Mesclar o quem no body diretamenteno objeto encontrado
+      if (req.body.idade)
+        req.body.idade = Number(req.body.idade);
+      Object.assign(growdever, req.body);
+
+      res.status(200).send({
+        ok: true,
+        mensagem: "Growdever encontrado com sucesso",
+        dados: growdever,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
         ok: false,
-        mensagem: "Growdever não encontrado",
+        mensagem: error.toString(),
       });
     }
-
-    // A MÁGICA para trocar os if´s: Mesclar o quem no body diretamenteno objeto encontrado
-    if (req.body.idade)
-      req.body.idade = Number(req.body.idade);
-    Object.assign(growdever, req.body);
-
-    res.status(200).send({
-      ok: true,
-      mensagem: "Growdever encontrado com sucesso",
-      dados: growdever,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      ok: false,
-      mensagem: error.toString(),
-    });
-  }
-});
+  },
+);
 
 /* POST  /growdevers - Criar lista de growdevers */
-app.post("/growdevers", [logMiddleware], (req, res) => {
-  try {
-    const { nome, email, idade, matriculado } = req.body;
-    // Lista de campos obrigatórios
-    const camposObrigatorios = [
-      "nome",
-      "email",
-      "idade",
-      "matriculado",
-    ];
-    // Procura se algum campo está faltando ou vazio
-    for (const campo of camposObrigatorios) {
-      if (
-        req.body[campo] === undefined ||
-        req.body[campo] === ""
-      ) {
-        return res.status(400).json({
-          ok: false,
-          mensagem: `O campo ${campo} não foi informado`,
-        });
-      }
-    }
-    // Verificação de idade mínima
-    if (Number(idade) < 18) {
-      return res.status(400).json({
-        ok: false,
-        mensagem:
-          "O growdever dever ter no mínimo 18 anos de idade",
+app.post(
+  "/growdevers",
+  [logMiddleware, verificarCamposObrigatoriosMiddleware],
+  (req, res) => {
+    try {
+      const { nome, email, idade, matriculado } = req.body;
+      const novoGrowdever = {
+        id: randomUUID(),
+        nome,
+        email,
+        idade,
+        matriculado: true,
+      };
+
+      growdevers.push(novoGrowdever);
+      res.status(201).send({
+        ok: true,
+        mensagem: "Growdever criado com sucesso!",
+        growdever: novoGrowdever,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        mensagem: error.toString(),
       });
     }
-    const novoGrowdever = {
-      id: randomUUID(),
-      nome,
-      email,
-      idade,
-      matriculado: true,
-    };
-
-    growdevers.push(novoGrowdever);
-    res.status(201).send({
-      ok: true,
-      mensagem: "Growdever criado com sucesso!",
-      growdever: novoGrowdever,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      mensagem: error.toString(),
-    });
-  }
-});
+  },
+);
 
 /* DELETE /growdevers/:id - Deletar um growdever */
 app.delete("/growdevers/:id", (req, res) => {
