@@ -60,3 +60,67 @@ export const validateGrowdeverMiddleware = (
 
   next();
 };
+
+// Verifica se os campos obrigatórios foram enviados (usado no POST e PUT)
+export const verificarCamposObrigatoriosMiddleware = (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const { nome, email, idade, matriculado } = req.body;
+    const campos = [
+      "nome",
+      "email",
+      "idade",
+      "matriculado",
+    ];
+
+    for (const campo of campos) {
+      if (
+        req.body[campo] === undefined ||
+        req.body[campo] === ""
+      ) {
+        return res.status(400).json({
+          ok: false,
+          mensagem: `O campo ${campo} é obrigatório.`,
+        });
+      }
+    }
+
+    if (Number(idade) < 18) {
+      return res.status(400).json({
+        ok: false,
+        mensagem: "O growdever deve ter no mínimo 18 anos.",
+      });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      mensagem: error.toString(),
+    });
+  }
+};
+
+// Verifica se o ID passado na URL existe (usado no GET/:id, PUT, PATCH, DELETE)
+export const verificarExistenciaGrowdeverMiddleware = (
+  req,
+  res,
+  next,
+) => {
+  const { id } = req.params;
+  const growdever = growdevers.find((g) => g.id === id);
+
+  if (!growdever) {
+    return res.status(404).json({
+      ok: false,
+      mensagem: "Growdever não encontrado.",
+    });
+  }
+
+  // Passando o growdever encontrado adiante para a rota não precisar buscar de novo
+  req.growdeverEncontrado = growdever;
+  next();
+};

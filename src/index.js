@@ -6,6 +6,8 @@ import {
   logMiddleware,
   logRequestMiddleware,
   validateGrowdeverMiddleware,
+  verificarCamposObrigatoriosMiddleware,
+  verificarExistenciaGrowdeverMiddleware,
 } from "./middlewares.js";
 
 dotenv.config();
@@ -79,40 +81,37 @@ app.get("/growdevers/:id", (req, res) => {
 });
 
 /* PUT /growdever/:id - Atualizar growdever específico */
-app.put("/growdevers/:id", (req, res) => {
-  try {
-    const { id } = req.params;
-    const { nome, email, idade, matriculado } = req.body;
+app.put(
+  "/growdevers/:id",
+  [
+    validateGrowdeverMiddleware,
+    verificarCamposObrigatoriosMiddleware,
+    verificarExistenciaGrowdeverMiddleware
+  ],
+  (req, res) => {
+    try {
+      const growdever = req.growdeverEncontrado;
+      const { nome, email, idade, matriculado } = req.body;
 
-    const growdever = growdevers.find(
-      (growdever) => growdever.id === id,
-    );
+      growdever.nome = nome;
+      growdever.email = email;
+      growdever.idade = Number(idade);
+      growdever.matriculado = matriculado;
 
-    if (!growdever) {
-      return res.status(404).send({
+      res.status(200).send({
+        ok: true,
+        mensagem: "Growdever atualizado com sucesso!",
+        dados: growdever,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
         ok: false,
-        mensagem: "Growdever não encontrado",
+        mensagem: error.toString(),
       });
     }
-
-    growdever.nome = nome;
-    growdever.email = email;
-    growdever.idade = Number(idade);
-    growdever.matriculado = matriculado;
-
-    res.status(200).send({
-      ok: true,
-      mensagem: "Growdever atualizado com sucesso!",
-      dados: growdevers,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      ok: false,
-      mensagem: error.toString(),
-    });
-  }
-});
+  },
+);
 
 /* PATCH /growdever/:id - */
 app.patch("/growdevers/:id", (req, res) => {
