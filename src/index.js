@@ -172,23 +172,23 @@ app.post(
 );
 
 /* DELETE /growdevers/:id - Deletar um growdever */
-app.delete("/growdevers/:id", (req, res) => {
-  const { id } = req.params;
-  const index = growdevers.findIndex(
-    (growdever) => growdever.id === id,
-  );
-  if (index === -1) {
-    return res.status(404).send({
-      ok: false,
-      mensagem: "Growdever não encontrado",
+app.delete(
+  "/growdevers/:id",
+  [verificarExistenciaGrowdeverMiddleware],
+  (req, res) => {
+    // Pegando o growdever encontrado pelo middleware
+    const growever = req.growdeverEncontrado;
+
+    // Descobrindo em qual posição(índice) esse objeto específico está
+    const index = growdevers.indexOf(growever);
+
+    growdevers.splice(index, 1);
+    res.status(200).json({
+      ok: true,
+      mensagem: "Growdever deletado com sucesso!",
     });
-  }
-  growdevers.splice(index, 1);
-  res.status(200).json({
-    ok: true,
-    mensagem: "Growdever deletado com sucesso!",
-  });
-});
+  },
+);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
