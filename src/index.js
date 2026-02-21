@@ -3,8 +3,6 @@ import * as dotenv from "dotenv";
 import { growdevers } from "./dados.js";
 import { randomUUID } from "crypto";
 import {
-  logMiddleware,
-  logRequestMiddleware,
   validateGrowdeverMiddleware,
   verificarCamposObrigatoriosMiddleware,
   verificarExistenciaGrowdeverMiddleware,
@@ -29,11 +27,7 @@ app.use(express.json());
 /* GET growdever?params="value" */
 app.get(
   "/growdevers",
-  [
-    logMiddleware,
-    logRequestMiddleware,
-    validateGrowdeverMiddleware,
-  ],
+  [validateGrowdeverMiddleware],
   (req, res) => {
     try {
       // recupera o que middleware guardou
@@ -54,31 +48,26 @@ app.get(
 );
 
 /* GET /growdevers/:id - Listar growdevers pelo ID */
-app.get("/growdevers/:id", (req, res) => {
-  try {
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      ok: false,
-      mensgem: error.toString(),
+app.get(
+  "/growdevers/:id",
+  [verificarExistenciaGrowdeverMiddleware],
+  (req, res) => {
+    const growdever = req.growdeverEncontrado;
+    res.status(200).send({
+      ok: true,
+      mensagem: "Growdever encontrado com sucesso!",
+      dados: growdever,
     });
-  }
-  const { id } = req.params;
-  const growdever = growdevers.find(
-    (growdever) => growdever.id === id,
-  );
-  if (!growdever) {
-    return res.status(404).send({
-      ok: false,
-      mensagem: "Growdever não encontrado",
-    });
-  }
-  res.status(200).send({
-    ok: true,
-    mensagem: "Growdever encontrado com sucesso!",
-    dados: growdever,
-  });
-});
+    try {
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        ok: false,
+        mensgem: error.toString(),
+      });
+    }
+  },
+);
 
 /* PUT /growdever/:id - Atualizar growdever específico */
 app.put(
@@ -144,7 +133,7 @@ app.patch(
 /* POST  /growdevers - Criar lista de growdevers */
 app.post(
   "/growdevers",
-  [logMiddleware, verificarCamposObrigatoriosMiddleware],
+  [verificarCamposObrigatoriosMiddleware],
   (req, res) => {
     try {
       const { nome, email, idade, matriculado } = req.body;
