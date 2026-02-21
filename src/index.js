@@ -7,11 +7,13 @@ import {
   verificarCamposObrigatoriosMiddleware,
   verificarExistenciaGrowdeverMiddleware,
 } from "./middlewares.js";
+import cors from "cors";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 /* Criar nossas rotas */
 /* GET /growdevers - listar growdevers */
