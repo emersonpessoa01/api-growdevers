@@ -65,7 +65,7 @@ app.get(
       console.log(error);
       res.status(500).json({
         ok: false,
-        mensgem: error.toString(),
+        mensagem: error.toString(),
       });
     }
   },

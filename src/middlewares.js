@@ -37,6 +37,7 @@ export const validateGrowdeverMiddleware = (
     });
     // Guarda o dados dentroo objeto req
     req.growdeversFiltrados = dadosFiltrados;
+    next();
   } catch (error) {
     return res.status(500).json({
       ok: false,
@@ -44,7 +45,6 @@ export const validateGrowdeverMiddleware = (
     });
   }
 
-  next();
 };
 
 // Verifica se os campos obrigatórios foram enviados (usado no POST e PUT)
