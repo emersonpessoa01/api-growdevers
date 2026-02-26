@@ -54,13 +54,13 @@ app.get(
   "/growdevers/:id",
   [verificarExistenciaGrowdeverMiddleware],
   (req, res) => {
+    try {
     const growdever = req.growdeverEncontrado;
     res.status(200).send({
       ok: true,
       mensagem: "Growdever encontrado com sucesso!",
       dados: growdever,
     });
-    try {
     } catch (error) {
       console.log(error);
       res.status(500).json({
