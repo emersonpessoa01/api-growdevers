@@ -24,6 +24,11 @@ A API está disponível publicamente:
 -   📖 **Documentação Interativa (Postman):**\
     https://documenter.getpostman.com/view/41098416/2sBXcHgy99
 
+
+[![Documentação Postman](./img/documentacao-interativa.png)](https://documenter.getpostman.com/view/41098416/2sBXcHgy99)
+
+*Clique na imagem acima para abrir a documentação oficial.*
+
 ------------------------------------------------------------------------
 
 ## 📌 Visão Geral
